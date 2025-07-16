@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Unidades PRO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --sidebar-bg: #1f2937;
+            --card-bg: #ffffff;
+            --primary-accent: #3b82f6;
+            --text-dark: #111827;
+            --text-light: #d1d5db;
+            --text-sidebar-active: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            display: flex;
+        }
+
+        #sidebar {
+            width: 240px;
+            background-color: var(--sidebar-bg);
+            color: var(--text-light);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar h1 {
+            font-size: 1.5rem;
+            padding: 0 20px 20px 20px;
+            color: var(--text-sidebar-active);
+            border-bottom: 1px solid #374151;
+            margin-bottom: 10px;
+        }
+
+        #sidebar nav ul {
+            list-style: none;
+        }
+
+        #sidebar nav a {
+            display: block;
+            padding: 12px 20px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        #sidebar nav a:hover {
+            background-color: #374151;
+        }
+
+        #sidebar nav a.active {
+            background-color: var(--primary-accent);
+            color: var(--text-sidebar-active);
+            border-left-color: #a5f3fc;
+        }
+        
+        #sidebar .footer {
+            margin-top: auto;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        #main-content {
+            margin-left: 240px;
+            padding: 30px;
+            width: calc(100% - 240px);
+        }
+
+        .converter-section {
+            display: none;
+        }
+
+        .converter-section.active {
+            display: block;
+        }
+
+        .converter-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .converter-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .conversion-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .input-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            color: #4b5563;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        
+        .equals-sign {
+            font-size: 1.5rem;
+            color: #9ca3af;
+        }
+        
+        #fractional-result {
+            font-weight: 500;
+            color: var(--primary-accent);
+            font-size: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            #sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                flex-direction: row;
+                align-items: center;
+                padding: 0;
+                overflow-x: auto;
+            }
+            #sidebar h1 {
+                display: none; /* Hide title on mobile for more space */
+            }
+            #sidebar nav {
+                width: 100%;
+            }
+            #sidebar nav ul {
+                display: flex;
+                width: 100%;
+            }
+             #sidebar nav li {
+                flex: 1;
+                text-align: center;
+            }
+            #sidebar nav a {
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                padding: 15px 5px;
+            }
+            #sidebar nav a.active {
+                border-left-color: transparent;
+                border-bottom-color: #a5f3fc;
+            }
+            #sidebar .footer {
+                display: none;
+            }
+            #main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+            .conversion-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .equals-sign {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <aside id="sidebar">
+        <h1>Conversor PRO</h1>
+        <nav>
+            <ul>
+                <li><a href="#comprimento" class="nav-link active">Comprimento</a></li>
+                <li><a href="#area" class="nav-link">Área</a></li>
+                <li><a href="#volume" class="nav-link">Volume</a></li>
+                <li><a href="#massa" class="nav-link">Massa</a></li>
+                <li><a href="#forca" class="nav-link">Força</a></li>
+                <li><a href="#pressao" class="nav-link">Pressão</a></li>
+                <li><a href="#velocidade" class="nav-link">Velocidade</a></li>
+                <li><a href="#torque" class="nav-link">Torque</a></li>
+                <li><a href="#potencia" class="nav-link">Potência</a></li>
+                <li><a href="#energia" class="nav-link">Energia</a></li>
+                <li><a href="#densidade" class="nav-link">Densidade</a></li>
+                <li><a href="#vazao" class="nav-link">Vazão</a></li>
+                <li><a href="#angulo" class="nav-link">Ângulo</a></li>
+            </ul>
+        </nav>
+        <div class="footer">
+            <p>&copy; 2024 - Gerado por Gemini</p>
+        </div>
+    </aside>
+
+    <main id="main-content">
+        <!-- Seção de Comprimento -->
+        <section id="comprimento" class="converter-section active">
+            <h2>Comprimento</h2>
+            <div class="converter-card">
+                <h3>Milímetro (mm) ↔ Polegada (in)</h3>
+                <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="mm">Milímetros (mm)</label>
+                        <input type="number" id="mm" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="inch-dec">Polegadas Decimais (in)</label>
+                        <input type="number" id="inch-dec" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+                 <div class="conversion-row" style="margin-top: 15px;">
+                    <div class="input-group">
+                        <label>Polegadas Fracionárias (aprox.)</label>
+                        <div id="fractional-result" class="input-group" style="padding: 10px; min-height: 42px; justify-content: center;">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="converter-card">
+                <h3>Metro (m) ↔ Pé (ft)</h3>
+                <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="m">Metros (m)</label>
+                        <input type="number" id="m" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="ft">Pés (ft)</label>
+                        <input type="number" id="ft" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+             <div class="converter-card">
+                <h3>Quilômetro (km) ↔ Milha (mi)</h3>
+                <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="km">Quilômetros (km)</label>
+                        <input type="number" id="km" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="mi">Milhas (mi)</label>
+                        <input type="number" id="mi" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Área -->
+        <section id="area" class="converter-section">
+            <h2>Área</h2>
+            <div class="converter-card">
+                <h3>Metro Quadrado (m²) ↔ Pé Quadrado (ft²)</h3>
+                <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="m2">m²</label>
+                        <input type="number" id="m2" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="ft2">ft²</label>
+                        <input type="number" id="ft2" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+            <div class="converter-card">
+                <h3>Hectare (ha) ↔ Acre (acre)</h3>
+                <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="ha">ha</label>
+                        <input type="number" id="ha" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="acre">acre</label>
+                        <input type="number" id="acre" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Seção de Volume -->
+        <section id="volume" class="converter-section">
+            <h2>Volume</h2>
+            <div class="converter-card">
+                <h3>Litro (L) ↔ Galão Americano (gal)</h3>
+                <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="l">Litros (L)</label>
+                        <input type="number" id="l" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="gal">Galões (gal)</label>
+                        <input type="number" id="gal" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+            <div class="converter-card">
+                <h3>Metro Cúbico (m³) ↔ Pé Cúbico (ft³)</h3>
+                <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="m3">m³</label>
+                        <input type="number" id="m3" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="ft3">ft³</label>
+                        <input type="number" id="ft3" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Massa -->
+        <section id="massa" class="converter-section">
+            <h2>Massa</h2>
+            <div class="converter-card">
+                <h3>Quilograma (kg) ↔ Libra (lb)</h3>
+                 <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="kg">kg</label>
+                        <input type="number" id="kg" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="lb">lb</label>
+                        <input type="number" id="lb" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+            <div class="converter-card">
+                <h3>Grama (g) ↔ Onça (oz)</h3>
+                 <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="g">g</label>
+                        <input type="number" id="g" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="oz">oz</label>
+                        <input type="number" id="oz" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Força -->
+        <section id="forca" class="converter-section">
+            <h2>Força</h2>
+            <div class="converter-card">
+                <h3>Newton (N) ↔ Libra-força (lbf)</h3>
+                 <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="n">N</label>
+                        <input type="number" id="n" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="lbf">lbf</label>
+                        <input type="number" id="lbf" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+            <div class="converter-card">
+                <h3>Quilonewton (kN) ↔ Kip (kilopound-force)</h3>
+                 <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="kn">kN</label>
+                        <input type="number" id="kn" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="kip">kip</label>
+                        <input type="number" id="kip" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Pressão -->
+        <section id="pressao" class="converter-section">
+            <h2>Pressão</h2>
+            <div class="converter-card">
+                <h3>Quilopascal (kPa) ↔ PSI (lbf/in²)</h3>
+                 <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="kpa">kPa</label>
+                        <input type="number" id="kpa" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="psi">psi</label>
+                        <input type="number" id="psi" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+             <div class="converter-card">
+                <h3>Bar ↔ Atmosfera (atm)</h3>
+                 <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="bar">bar</label>
+                        <input type="number" id="bar" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="atm">atm</label>
+                        <input type="number" id="atm" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Seção de Velocidade -->
+        <section id="velocidade" class="converter-section">
+            <h2>Velocidade</h2>
+            <div class="converter-card">
+                <h3>Metros por segundo (m/s) ↔ Pés por segundo (ft/s)</h3>
+                 <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="mps">m/s</label>
+                        <input type="number" id="mps" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="ftps">ft/s</label>
+                        <input type="number" id="ftps" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+            <div class="converter-card">
+                <h3>Quilômetros por hora (km/h) ↔ Milhas por hora (mph)</h3>
+                 <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="kmh">km/h</label>
+                        <input type="number" id="kmh" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="mph">mph</label>
+                        <input type="number" id="mph" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Torque -->
+        <section id="torque" class="converter-section">
+            <h2>Torque</h2>
+            <div class="converter-card">
+                <h3>Newton-metro (N·m) ↔ Libra-força-pé (lbf·ft)</h3>
+                 <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="nm">N·m</label>
+                        <input type="number" id="nm" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="lbfft">lbf·ft</label>
+                        <input type="number" id="lbfft" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Potência -->
+        <section id="potencia" class="converter-section">
+            <h2>Potência</h2>
+            <div class="converter-card">
+                <h3>Quilowatt (kW) ↔ Horsepower (hp)</h3>
+                 <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="kw">kW</label>
+                        <input type="number" id="kw" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="hp">hp</label>
+                        <input type="number" id="hp" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Energia -->
+        <section id="energia" class="converter-section">
+            <h2>Energia</h2>
+            <div class="converter-card">
+                <h3>Joule (J) ↔ British Thermal Unit (BTU)</h3>
+                 <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="j">J</label>
+                        <input type="number" id="j" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="btu">BTU</label>
+                        <input type="number" id="btu" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Densidade -->
+        <section id="densidade" class="converter-section">
+            <h2>Densidade</h2>
+            <div class="converter-card">
+                <h3>kg/m³ ↔ lb/ft³</h3>
+                 <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="kgm3">kg/m³</label>
+                        <input type="number" id="kgm3" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="lbft3">lb/ft³</label>
+                        <input type="number" id="lbft3" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Vazão -->
+        <section id="vazao" class="converter-section">
+            <h2>Vazão</h2>
+            <div class="converter-card">
+                <h3>Litros por segundo (L/s) ↔ Galões por minuto (GPM)</h3>
+                 <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="lps">L/s</label>
+                        <input type="number" id="lps" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="gpm">GPM</label>
+                        <input type="number" id="gpm" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Seção de Ângulo -->
+        <section id="angulo" class="converter-section">
+            <h2>Ângulo e Inclinação</h2>
+            <div class="converter-card">
+                <h3>Inclinação (%) ↔ Ângulo (°)</h3>
+                 <div class="conversion-row">
+                    <div class="input-group">
+                        <label for="percent">%</label>
+                        <input type="number" id="percent" oninput="convert(this.id, this.value)">
+                    </div>
+                    <div class="equals-sign">=</div>
+                    <div class="input-group">
+                        <label for="deg">°</label>
+                        <input type="number" id="deg" oninput="convert(this.id, this.value)">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- Navigation Logic ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.converter-section');
+
+            // Function to change active section
+            const changeSection = (hash) => {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.hash === hash);
+                });
+                sections.forEach(section => {
+                    section.classList.toggle('active', '#' + section.id === hash);
+                });
+            };
+
+            // Initial load
+            changeSection(window.location.hash || '#comprimento');
+
+            // Handle clicks
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    history.pushState(null, '', this.hash); // Change URL without reloading
+                    changeSection(this.hash);
+                });
+            });
+            
+            // Handle back/forward browser buttons
+            window.addEventListener('popstate', () => {
+                changeSection(window.location.hash || '#comprimento');
+            });
+        });
+
+        // --- Conversion Logic ---
+        const factors = {
+            // Comprimento
+            mm: { target: 'inch-dec', factor: 1 / 25.4 },
+            'inch-dec': { target: 'mm', factor: 25.4 },
+            m: { target: 'ft', factor: 3.28084 },
+            ft: { target: 'm', factor: 1 / 3.28084 },
+            km: { target: 'mi', factor: 0.621371 },
+            mi: { target: 'km', factor: 1 / 0.621371 },
+            // Area
+            m2: { target: 'ft2', factor: 10.7639 },
+            ft2: { target: 'm2', factor: 1 / 10.7639 },
+            ha: { target: 'acre', factor: 2.47105 },
+            acre: { target: 'ha', factor: 1 / 2.47105 },
+            // Volume
+            l: { target: 'gal', factor: 0.264172 },
+            gal: { target: 'l', factor: 1 / 0.264172 },
+            m3: { target: 'ft3', factor: 35.3147 },
+            ft3: { target: 'm3', factor: 1 / 35.3147 },
+            // Massa
+            kg: { target: 'lb', factor: 2.20462 },
+            lb: { target: 'kg', factor: 1 / 2.20462 },
+            g: { target: 'oz', factor: 0.035274 },
+            oz: { target: 'g', factor: 1 / 0.035274 },
+            // Força
+            n: { target: 'lbf', factor: 0.224809 },
+            lbf: { target: 'n', factor: 1 / 0.224809 },
+            kn: { target: 'kip', factor: 0.224809 },
+            kip: { target: 'kn', factor: 1 / 0.224809 },
+            // Pressão
+            kpa: { target: 'psi', factor: 0.145038 },
+            psi: { target: 'kpa', factor: 1 / 0.145038 },
+            bar: { target: 'atm', factor: 0.986923 },
+            atm: { target: 'bar', factor: 1 / 0.986923 },
+            // Velocidade
+            mps: { target: 'ftps', factor: 3.28084 },
+            ftps: { target: 'mps', factor: 1 / 3.28084 },
+            kmh: { target: 'mph', factor: 0.621371 },
+            mph: { target: 'kmh', factor: 1 / 0.621371 },
+            // Torque
+            nm: { target: 'lbfft', factor: 0.737562 },
+            lbfft: { target: 'nm', factor: 1 / 0.737562 },
+            // Potência
+            kw: { target: 'hp', factor: 1.34102 },
+            hp: { target: 'kw', factor: 1 / 1.34102 },
+            // Energia
+            j: { target: 'btu', factor: 0.000947817 },
+            btu: { target: 'j', factor: 1 / 0.000947817 },
+            // Densidade
+            kgm3: { target: 'lbft3', factor: 0.062428 },
+            lbft3: { target: 'kgm3', factor: 1 / 0.062428 },
+            // Vazão
+            lps: { target: 'gpm', factor: 15.8503 },
+            gpm: { target: 'lps', factor: 1 / 15.8503 },
+        };
+        
+        // --- Special Functions ---
+        function gcd(a, b) { // Greatest Common Divisor
+            return b ? gcd(b, a % b) : a;
+        }
+
+        function toFractionalInch(decimalInches) {
+            if (isNaN(decimalInches) || decimalInches === 0) return '-';
+            const whole = Math.floor(decimalInches);
+            const fraction = decimalInches - whole;
+            if (fraction === 0) return `${whole}"`;
+
+            const denominator = 64; // Common precision for engineering
+            let numerator = Math.round(fraction * denominator);
+            if (numerator === 0) return `≈ ${whole}"`;
+            if (numerator === denominator) return `${whole + 1}"`;
+
+            const divisor = gcd(numerator, denominator);
+            const simpNum = numerator / divisor;
+            const simpDen = denominator / divisor;
+
+            return (whole > 0 ? `${whole} ` : '') + `${simpNum}/${simpDen}"`;
+        }
+
+        function convert(id, value) {
+            const val = parseFloat(value);
+            if (isNaN(val) || value === '') {
+                // Clear all related fields if input is invalid or empty
+                const allIds = Object.keys(factors).filter(k => factors[k].target === id || factors[id]?.target === k);
+                allIds.push(id, factors[id]?.target);
+                new Set(allIds).forEach(fieldId => {
+                    if (document.getElementById(fieldId)) document.getElementById(fieldId).value = '';
+                });
+                if (id === 'mm' || id === 'inch-dec') document.getElementById('fractional-result').innerHTML = '-';
+                return;
+            }
+
+            // Handle standard conversions
+            if (factors[id]) {
+                const { target, factor } = factors[id];
+                document.getElementById(target).value = (val * factor).toPrecision(6);
+            }
+            
+            // Handle special cases
+            if (id === 'mm' || id === 'inch-dec') {
+                const inches = id === 'mm' ? val / 25.4 : val;
+                document.getElementById('fractional-result').innerHTML = toFractionalInch(inches);
+            }
+            
+            if (id === 'percent') {
+                const angle = Math.atan(val / 100) * (180 / Math.PI);
+                document.getElementById('deg').value = angle.toPrecision(6);
+            } else if (id === 'deg') {
+                const percentage = Math.tan(val * Math.PI / 180) * 100;
+                document.getElementById('percent').value = percentage.toPrecision(6);
+            }
+        }
+    </script>
+
+</body>
+</html>
