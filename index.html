@@ -192,7 +192,7 @@
             color: var(--text-dark);
         }
 
-        .conversion-row {
+        .conversion-row, .calculator-row {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -211,9 +211,9 @@
             color: #6b7280;
         }
 
-        .input-group input {
+        .input-group input, .input-group select {
             width: 100%;
-            padding: 10px 40px 10px 10px; /* Space for copy button */
+            padding: 10px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 1rem;
@@ -222,8 +222,12 @@
             color: var(--text-dark);
             transition: border-color 0.2s, box-shadow 0.2s;
         }
+        
+        .input-group input {
+             padding-right: 40px; /* Space for copy button */
+        }
 
-        .input-group input:focus {
+        .input-group input:focus, .input-group select:focus {
             outline: none;
             border-color: var(--primary-accent);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
@@ -264,13 +268,15 @@
 
         .equals-sign { display: none; } /* Replaced by swap button */
         
-        #fractional-result {
+        #fractional-result, .result-display {
             font-weight: 500;
             color: var(--primary-accent);
             font-size: 1rem;
             background-color: var(--bg-color);
             border: 1px solid var(--border-color);
             border-radius: 6px;
+            padding: 10px;
+            min-height: 42.5px;
         }
 
         /* Responsive Design */
@@ -289,7 +295,7 @@
                 width: 100%;
                 padding: 20px;
             }
-            .conversion-row {
+            .conversion-row, .calculator-row {
                 flex-direction: column;
                 align-items: stretch;
             }
@@ -323,6 +329,7 @@
                 <li><a href="#energia" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M19 3v4M3 10h18M5 14h14M5 18h14M3 22h18"></path></svg>Energia</a></li>
                 <li><a href="#densidade" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 4v0a2 2 0 012-2h2a2 2 0 012 2v0m-6 8v0a2 2 0 012-2h2a2 2 0 012 2v0m-6 8v0a2 2 0 012-2h2a2 2 0 012 2v0M9 4h6v16H9V4z"></path></svg>Densidade</a></li>
                 <li><a href="#vazao" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>Vazão</a></li>
+                <li><a href="#rugosidade" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h2M19 12h2M6 6l-2 2M18 6l2 2M6 18l-2-2M18 18l2-2"></path></svg>Rugosidade</a></li>
                 <li><a href="#angulo" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>Ângulo</a></li>
             </ul>
         </nav>
@@ -381,6 +388,7 @@
                 ]},
                 pressao: { title: 'Pressão', conversions: [
                     { title: 'Quilopascal (kPa) ↔ PSI (lbf/in²)', units: ['kpa', 'psi'] },
+                    { title: 'Megapascal (MPa) ↔ Kip por Polegada² (ksi)', units: ['mpa', 'ksi'] },
                     { title: 'Bar ↔ Atmosfera (atm)', units: ['bar', 'atm'] }
                 ]},
                 velocidade: { title: 'Velocidade', conversions: [
@@ -400,7 +408,22 @@
                     { title: 'kg/m³ ↔ lb/ft³', units: ['kgm3', 'lbft3'] }
                 ]},
                 vazao: { title: 'Vazão', conversions: [
-                    { title: 'Litros por segundo (L/s) ↔ Galões por minuto (GPM)', units: ['lps', 'gpm'] }
+                    { title: 'Litros por segundo (L/s) ↔ Galões por minuto (GPM)', units: ['lps', 'gpm'] },
+                    { title: 'Metros cúbicos por hora (m³/h) ↔ Pés cúbicos por minuto (CFM)', units: ['m3h', 'cfm'] },
+                    { title: 'Metros cúbicos por segundo (m³/s) ↔ Litros por segundo (L/s)', units: ['m3s', 'lps_2'] }
+                ]},
+                rugosidade: { title: 'Rugosidade de Tubulação', calculators: [
+                    { title: 'Rugosidade Absoluta (k) por Material', type: 'roughness', materials: {
+                        'Aço Rebitado Novo': 1.5,
+                        'Concreto': 1.0,
+                        'Madeira': 0.5,
+                        'Ferro Fundido': 0.26,
+                        'Aço Galvanizado': 0.15,
+                        'Aço Comercial ou Soldado': 0.046,
+                        'Ferro Forjado': 0.046,
+                        'Tubo Puxado (Aço, Latão, Cobre)': 0.0015,
+                        'PVC e Vidro': 0.0015
+                    }}
                 ]},
                 angulo: { title: 'Ângulo e Inclinação', conversions: [
                     { title: 'Inclinação (%) ↔ Ângulo (°)', units: ['percent', 'deg'], type: 'angle' }
@@ -414,18 +437,18 @@
                 'l': 'Litros (L)', 'gal': 'Galões (gal)', 'm3': 'm³', 'ft3': 'ft³',
                 'kg': 'Quilogramas (kg)', 'lb': 'Libras (lb)', 'g': 'Gramas (g)', 'oz': 'Onças (oz)',
                 'n': 'Newtons (N)', 'lbf': 'Libras-força (lbf)', 'kn': 'Quilonewtons (kN)', 'kip': 'Kips',
-                'kpa': 'Quilopascals (kPa)', 'psi': 'PSI (lbf/in²)', 'bar': 'Bar', 'atm': 'Atmosferas (atm)',
+                'kpa': 'Quilopascals (kPa)', 'psi': 'PSI (lbf/in²)', 'mpa': 'Megapascals (MPa)', 'ksi': 'Kip/in² (ksi)', 'bar': 'Bar', 'atm': 'Atmosferas (atm)',
                 'mps': 'm/s', 'ftps': 'ft/s', 'kmh': 'km/h', 'mph': 'mph',
                 'nm': 'N·m', 'lbfft': 'lbf·ft',
                 'kw': 'Quilowatts (kW)', 'hp': 'Horsepower (hp)',
                 'j': 'Joules (J)', 'btu': 'BTUs',
                 'kgm3': 'kg/m³', 'lbft3': 'lb/ft³',
-                'lps': 'L/s', 'gpm': 'GPM',
+                'lps': 'L/s', 'gpm': 'GPM', 'm3h': 'm³/h', 'cfm': 'CFM', 'm3s': 'm³/s', 'lps_2': 'L/s',
                 'percent': 'Inclinação (%)', 'deg': 'Ângulo (°)'
             };
 
             // --- HTML Generation ---
-            function createInputGroup(unitId, isFirst) {
+            function createInputGroup(unitId) {
                 return `
                     <div class="input-group" data-unit-id="${unitId}">
                         <label for="${unitId}">${unitLabels[unitId]}</label>
@@ -445,28 +468,45 @@
                     sectionEl.className = 'converter-section';
                     
                     let content = `<h2>${sectionData.title}</h2>`;
-                    sectionData.conversions.forEach(conv => {
-                        content += `<div class="converter-card" data-type="${conv.type || 'standard'}"><h3>${conv.title}</h3>`;
-                        
-                        const groups = conv.units.map((unit, index) => createInputGroup(unit, index === 0)).join(`
-                            <button class="swap-btn" onclick="swapUnits(this)" title="Inverter unidades">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 12l-4-4m4 4l4-4m6 8v-12m0 12l4-4m-4 4l-4-4"></path></svg>
-                            </button>
-                        `);
-                        
-                        content += `<div class="conversion-row">${groups}</div>`;
+                    
+                    if (sectionData.conversions) {
+                        sectionData.conversions.forEach(conv => {
+                            content += `<div class="converter-card" data-type="${conv.type || 'standard'}"><h3>${conv.title}</h3>`;
+                            const groups = conv.units.map(unit => createInputGroup(unit)).join(`
+                                <button class="swap-btn" onclick="swapUnits(this)" title="Inverter unidades">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 12l-4-4m4 4l4-4m6 8v-12m0 12l4-4m-4 4l-4-4"></path></svg>
+                                </button>
+                            `);
+                            content += `<div class="conversion-row">${groups}</div>`;
+                            if (conv.special === 'fractional') {
+                                content += `<div class="conversion-row" style="margin-top: 15px;"><div class="input-group"><label>Polegadas Fracionárias (aprox.)</label><div id="fractional-result" class="result-display">-</div></div></div>`;
+                            }
+                            content += `</div>`;
+                        });
+                    }
 
-                        if (conv.special === 'fractional') {
-                            content += `
-                                <div class="conversion-row" style="margin-top: 15px;">
+                    if (sectionData.calculators) {
+                        sectionData.calculators.forEach(calc => {
+                             if (calc.type === 'roughness') {
+                                content += `<div class="converter-card"><h3>${calc.title}</h3><div class="calculator-row">`;
+                                const options = Object.keys(calc.materials).map(mat => `<option value="${calc.materials[mat]}">${mat}</option>`).join('');
+                                content += `
                                     <div class="input-group">
-                                        <label>Polegadas Fracionárias (aprox.)</label>
-                                        <div id="fractional-result" class="input-group" style="padding: 10px; min-height: 42px; justify-content: center;">-</div>
+                                        <label for="material-select">Material</label>
+                                        <select id="material-select" onchange="updateRoughness(this)">
+                                            <option value="">-- Selecione um material --</option>
+                                            ${options}
+                                        </select>
                                     </div>
-                                </div>`;
-                        }
-                        content += `</div>`;
-                    });
+                                    <div class="input-group">
+                                        <label>Rugosidade Absoluta (k)</label>
+                                        <div id="roughness-result" class="result-display">-</div>
+                                    </div>
+                                </div></div>`;
+                             }
+                        });
+                    }
+                    
                     sectionEl.innerHTML = content;
                     mainContent.appendChild(sectionEl);
                 }
@@ -518,26 +558,29 @@
 
         // --- Global Functions ---
         const factors = {
-            'mm': { target: 'inch-dec', factor: 1 / 25.4 }, 'inch-dec': { target: 'mm', factor: 25.4 },
-            'm': { target: 'ft', factor: 3.28084 }, 'ft': { target: 'm', factor: 1 / 3.28084 },
-            'km': { target: 'mi', factor: 0.621371 }, 'mi': { target: 'km', factor: 1 / 0.621371 },
-            'm2': { target: 'ft2', factor: 10.7639 }, 'ft2': { target: 'm2', factor: 1 / 10.7639 },
-            'ha': { target: 'acre', factor: 2.47105 }, 'acre': { target: 'ha', factor: 1 / 2.47105 },
-            'l': { target: 'gal', factor: 0.264172 }, 'gal': { target: 'l', factor: 3.78541 },
-            'm3': { target: 'ft3', factor: 35.3147 }, 'ft3': { target: 'm3', factor: 1 / 35.3147 },
-            'kg': { target: 'lb', factor: 2.20462 }, 'lb': { target: 'kg', factor: 1 / 2.20462 },
-            'g': { target: 'oz', factor: 0.035274 }, 'oz': { target: 'g', factor: 1 / 0.035274 },
-            'n': { target: 'lbf', factor: 0.224809 }, 'lbf': { target: 'n', factor: 4.44822 },
-            'kn': { target: 'kip', factor: 0.224809 }, 'kip': { target: 'kn', factor: 4.44822 },
-            'kpa': { target: 'psi', factor: 0.145038 }, 'psi': { target: 'kpa', factor: 6.89476 },
-            'bar': { target: 'atm', factor: 0.986923 }, 'atm': { target: 'bar', factor: 1.01325 },
-            'mps': { target: 'ftps', factor: 3.28084 }, 'ftps': { target: 'mps', factor: 1 / 3.28084 },
-            'kmh': { target: 'mph', factor: 0.621371 }, 'mph': { target: 'kmh', factor: 1.60934 },
-            'nm': { target: 'lbfft', factor: 0.737562 }, 'lbfft': { target: 'nm', factor: 1.35582 },
-            'kw': { target: 'hp', factor: 1.34102 }, 'hp': { target: 'kw', factor: 0.7457 },
-            'j': { target: 'btu', factor: 0.000947817 }, 'btu': { target: 'j', factor: 1055.06 },
-            'kgm3': { target: 'lbft3', factor: 0.062428 }, 'lbft3': { target: 'kgm3', factor: 16.0185 },
-            'lps': { target: 'gpm', factor: 15.8503 }, 'gpm': { target: 'lps', factor: 0.0630902 },
+            'mm': { factor: 1 / 25.4 }, 'inch-dec': { factor: 25.4 },
+            'm': { factor: 3.28084 }, 'ft': { factor: 1 / 3.28084 },
+            'km': { factor: 0.621371 }, 'mi': { factor: 1.60934 },
+            'm2': { factor: 10.7639 }, 'ft2': { factor: 1 / 10.7639 },
+            'ha': { factor: 2.47105 }, 'acre': { factor: 1 / 2.47105 },
+            'l': { factor: 0.264172 }, 'gal': { factor: 3.78541 },
+            'm3': { factor: 35.3147 }, 'ft3': { factor: 1 / 35.3147 },
+            'kg': { factor: 2.20462 }, 'lb': { factor: 1 / 2.20462 },
+            'g': { factor: 0.035274 }, 'oz': { factor: 1 / 0.035274 },
+            'n': { factor: 0.224809 }, 'lbf': { factor: 4.44822 },
+            'kn': { factor: 0.224809 }, 'kip': { factor: 4.44822 },
+            'kpa': { factor: 0.145038 }, 'psi': { factor: 6.89476 },
+            'mpa': { factor: 0.145038 }, 'ksi': { factor: 6.89476 },
+            'bar': { factor: 0.986923 }, 'atm': { factor: 1.01325 },
+            'mps': { factor: 3.28084 }, 'ftps': { factor: 1 / 3.28084 },
+            'kmh': { factor: 0.621371 }, 'mph': { factor: 1.60934 },
+            'nm': { factor: 0.737562 }, 'lbfft': { factor: 1.35582 },
+            'kw': { factor: 1.34102 }, 'hp': { factor: 0.7457 },
+            'j': { factor: 0.000947817 }, 'btu': { factor: 1055.06 },
+            'kgm3': { factor: 0.062428 }, 'lbft3': { factor: 16.0185 },
+            'lps': { factor: 15.8503 }, 'gpm': { factor: 1 / 15.8503 },
+            'm3h': { factor: 0.588578 }, 'cfm': { factor: 1 / 0.588578 },
+            'm3s': { factor: 1000 }, 'lps_2': { factor: 1 / 1000 }
         };
 
         function gcd(a, b) { return b ? gcd(b, a % b) : a; }
@@ -566,12 +609,16 @@
         function swapUnits(btn) {
             const row = btn.closest('.conversion-row');
             const groups = row.querySelectorAll('.input-group');
-            row.insertBefore(groups[1], groups[0]); // Swap the DOM elements
-            
-            // Clear values after swapping
+            row.insertBefore(groups[1], groups[0]);
             groups.forEach(g => g.querySelector('input').value = '');
             const fractionalResult = row.parentElement.querySelector('#fractional-result');
             if(fractionalResult) fractionalResult.innerHTML = '-';
+        }
+        
+        function updateRoughness(selectElement) {
+            const resultDiv = document.getElementById('roughness-result');
+            const value = selectElement.value;
+            resultDiv.textContent = value ? `${value} mm` : '-';
         }
 
         function convert(id, value) {
@@ -588,48 +635,38 @@
 
             if (conversionType === 'temperature') {
                 let c, f, k;
-                if (id === 'celsius') {
-                    c = val;
-                    f = c * 9/5 + 32;
-                    k = c + 273.15;
-                } else if (id === 'fahrenheit') {
-                    f = val;
-                    c = (f - 32) * 5/9;
-                    k = c + 273.15;
-                } else if (id === 'kelvin') {
-                    k = val;
-                    c = k - 273.15;
-                    f = c * 9/5 + 32;
-                }
-                document.getElementById('celsius').value = id === 'celsius' ? val : c.toPrecision(6);
-                document.getElementById('fahrenheit').value = id === 'fahrenheit' ? val : f.toPrecision(6);
-                document.getElementById('kelvin').value = id === 'kelvin' ? val : k.toPrecision(6);
-
+                if (id === 'celsius') { c = val; f = c * 9/5 + 32; k = c + 273.15; }
+                else if (id === 'fahrenheit') { f = val; c = (f - 32) * 5/9; k = c + 273.15; }
+                else { k = val; c = k - 273.15; f = c * 9/5 + 32; }
+                if (document.getElementById('celsius').id !== id) document.getElementById('celsius').value = c.toPrecision(6);
+                if (document.getElementById('fahrenheit').id !== id) document.getElementById('fahrenheit').value = f.toPrecision(6);
+                if (document.getElementById('kelvin').id !== id) document.getElementById('kelvin').value = k.toPrecision(6);
             } else if (conversionType === 'angle') {
-                if (id === 'percent') {
-                    document.getElementById('deg').value = (Math.atan(val / 100) * (180 / Math.PI)).toPrecision(6);
-                } else { // deg
-                    document.getElementById('percent').value = (Math.tan(val * Math.PI / 180) * 100).toPrecision(6);
-                }
+                if (id === 'percent') document.getElementById('deg').value = (Math.atan(val / 100) * (180 / Math.PI)).toPrecision(6);
+                else document.getElementById('percent').value = (Math.tan(val * Math.PI / 180) * 100).toPrecision(6);
             } else { // Standard conversion
-                const sourceUnit = card.querySelector('.input-group:first-child').dataset.unitId;
-                const targetUnit = card.querySelector('.input-group:last-child').dataset.unitId;
-                
-                const currentId = (id === sourceUnit) ? sourceUnit : targetUnit;
-                const targetId = (id === sourceUnit) ? targetUnit : sourceUnit;
-                
-                if (factors[currentId] && factors[currentId].target === targetId) {
-                    document.getElementById(targetId).value = (val * factors[currentId].factor).toPrecision(6);
-                } else if (factors[targetId] && factors[targetId].target === currentId) {
-                     document.getElementById(targetId).value = (val / factors[currentId].factor).toPrecision(6);
+                const row = document.getElementById(id).closest('.conversion-row');
+                const allInputs = row.querySelectorAll('input[type="number"]');
+                let targetId;
+                allInputs.forEach(input => {
+                    if (input.id !== id) {
+                        targetId = input.id;
+                    }
+                });
+
+                if (targetId && factors[id]) {
+                    const factor = factors[id].factor;
+                    document.getElementById(targetId).value = (val * factor).toPrecision(6);
                 }
                 
                 // Handle fractional inches special case
                 const fractionalResult = card.querySelector('#fractional-result');
                 if (fractionalResult) {
-                    const inches = (id === 'mm') ? val / 25.4 : (id === 'inch-dec' ? val : null);
-                    if (inches !== null) {
-                        fractionalResult.innerHTML = toFractionalInch(inches);
+                    const inchInput = card.querySelector('#inch-dec');
+                    if (inchInput && inchInput.value) {
+                        fractionalResult.innerHTML = toFractionalInch(parseFloat(inchInput.value));
+                    } else {
+                         fractionalResult.innerHTML = '-';
                     }
                 }
             }
