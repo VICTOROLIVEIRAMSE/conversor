@@ -298,6 +298,7 @@
                 <li><a href="#vazao" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>Vazão</a></li>
                 <li><a href="#rugosidade" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h2M19 12h2M6 6l-2 2M18 6l2 2M6 18l-2-2M18 18l2-2"></path></svg>Rugosidade</a></li>
                 <li><a href="#angulo" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>Ângulo</a></li>
+                <li><a href="#temperatura" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a4 4 0 10-8 0 4 4 0 008 0zm-4 7.5V19m-4-6.5a4 4 0 118 0 4 4 0 01-8 0zM9 10a1 1 0 100-2 1 1 0 000 2z"></path></svg>Temperatura</a></li>
             </ul>
         </nav>
         <div class="footer">
@@ -349,6 +350,9 @@
                     kg: { name: 'Quilograma (kg)', factor: 1 }, g: { name: 'Grama (g)', factor: 0.001 }, lb: { name: 'Libra (lb)', factor: 0.453592 },
                     oz: { name: 'Onça (oz)', factor: 0.0283495 }, tonne: { name: 'Tonelada (t)', factor: 1000 }, short_ton: { name: 'Tonelada Curta (ton)', factor: 907.185 }
                 }},
+                time: { name: 'Tempo', base: 's', units: {
+                    s: { name: 'Segundo (s)', factor: 1 }, min: { name: 'Minuto (min)', factor: 60 }, h: { name: 'Hora (h)', factor: 3600 }
+                }},
                 speed: { name: 'Velocidade', base: 'mps', units: {
                     mps: { name: 'Metro/segundo (m/s)', factor: 1 }, kmh: { name: 'Quilômetro/hora (km/h)', factor: 1 / 3.6 },
                     mph: { name: 'Milha/hora (mph)', factor: 0.44704 }, knot: { name: 'Nó (knot)', factor: 0.514444 }, ftps: { name: 'Pé/segundo (ft/s)', factor: 0.3048 }
@@ -378,7 +382,7 @@
                 potencia: { title: 'Potência', type: 'simple', unit: 'power' },
                 energia: { title: 'Energia', type: 'simple', unit: 'energy' },
                 densidade: { title: 'Densidade', type: 'composite', numerator: 'mass', denominator: 'volume' },
-                vazao: { title: 'Vazão', type: 'composite', numerator: 'volume', denominator: 'time' }, // Time is special
+                vazao: { title: 'Vazão', type: 'composite', numerator: 'volume', denominator: 'time' },
                 rugosidade: { title: 'Rugosidade de Tubulação', type: 'calculator', subtype: 'roughness', materials: {
                     'Aço Rebitado Novo': 1.5, 'Concreto': 1.0, 'Madeira': 0.5, 'Ferro Fundido': 0.26, 'Aço Galvanizado': 0.15,
                     'Aço Comercial ou Soldado': 0.046, 'Ferro Forjado': 0.046, 'Tubo Puxado (Aço, Latão, Cobre)': 0.0015, 'PVC e Vidro': 0.0015
@@ -400,7 +404,7 @@
                     card.dataset.section = key;
 
                     if (section.type === 'simple' || section.type === 'composite') {
-                        card.innerHTML = createDynamicConverter(section);
+                        card.innerHTML = createDynamicConverter(key, section);
                     } else if (section.type === 'calculator') {
                         card.innerHTML = createRoughnessCalculator(section);
                     } else if (section.type === 'special') {
@@ -419,25 +423,26 @@
                     .join('');
             }
             
-            function createDynamicConverter(section) {
+            function createDynamicConverter(sectionKey, section) {
                 const isComposite = section.type === 'composite';
                 const fromNumOptions = isComposite ? createUnitOptions(section.numerator) : createUnitOptions(section.unit);
                 const fromDenOptions = isComposite ? createUnitOptions(section.denominator) : '';
                 const toNumOptions = fromNumOptions;
                 const toDenOptions = fromDenOptions;
+                const eventListener = `oninput="convertDynamic(this)" onchange="convertDynamic(this)"`;
 
                 return `
                     <div class="conversion-row">
                         <div class="input-group">
                             <label>De</label>
-                            <input type="number" class="from-value" oninput="convertDynamic('${section.unit || section.numerator}')">
+                            <input type="number" class="from-value" ${eventListener}>
                             ${isComposite ? 
                                 `<div class="composite-unit-selector">
-                                    <select class="from-num-unit" onchange="convertDynamic('${section.unit || section.numerator}')">${fromNumOptions}</select>
+                                    <select class="from-num-unit" ${eventListener}>${fromNumOptions}</select>
                                     <span>/</span>
-                                    <select class="from-den-unit" onchange="convertDynamic('${section.unit || section.numerator}')">${fromDenOptions}</select>
+                                    <select class="from-den-unit" ${eventListener}>${fromDenOptions}</select>
                                 </div>` :
-                                `<select class="from-unit" onchange="convertDynamic('${section.unit}')">${fromNumOptions}</select>`
+                                `<select class="from-unit" ${eventListener}>${fromNumOptions}</select>`
                             }
                         </div>
                         <div class="input-group">
@@ -445,11 +450,11 @@
                             <input type="number" class="to-value" readonly>
                             ${isComposite ? 
                                 `<div class="composite-unit-selector">
-                                    <select class="to-num-unit" onchange="convertDynamic('${section.unit || section.numerator}')">${toNumOptions}</select>
+                                    <select class="to-num-unit" ${eventListener}>${toNumOptions}</select>
                                     <span>/</span>
-                                    <select class="to-den-unit" onchange="convertDynamic('${section.unit || section.numerator}')">${toDenOptions}</select>
+                                    <select class="to-den-unit" ${eventListener}>${toDenOptions}</select>
                                 </div>` :
-                                `<select class="to-unit" onchange="convertDynamic('${section.unit}')">${toNumOptions}</select>`
+                                `<select class="to-unit" ${eventListener}>${toNumOptions}</select>`
                             }
                         </div>
                     </div>
@@ -477,9 +482,40 @@
                 `;
             }
             
-            // Re-add special converters for simplicity
-            function createTemperatureConverter() { /* ... similar to old version ... */ return '<h3>Temperatura</h3>...'; }
-            function createAngleConverter() { /* ... similar to old version ... */ return '<h3>Ângulo</h3>...'; }
+            function createTemperatureConverter() {
+                return `
+                    <h3>Celsius (°C) ↔ Fahrenheit (°F) ↔ Kelvin (K)</h3>
+                    <div class="conversion-row" data-type="temperature">
+                        <div class="input-group">
+                            <label for="celsius">Celsius (°C)</label>
+                            <input type="number" id="celsius" oninput="convertSpecial(this)">
+                        </div>
+                        <div class="input-group">
+                            <label for="fahrenheit">Fahrenheit (°F)</label>
+                            <input type="number" id="fahrenheit" oninput="convertSpecial(this)">
+                        </div>
+                        <div class="input-group">
+                            <label for="kelvin">Kelvin (K)</label>
+                            <input type="number" id="kelvin" oninput="convertSpecial(this)">
+                        </div>
+                    </div>
+                `;
+            }
+            function createAngleConverter() {
+                 return `
+                    <h3>Inclinação (%) ↔ Ângulo (°)</h3>
+                    <div class="conversion-row" data-type="angle">
+                        <div class="input-group">
+                            <label for="percent">Inclinação (%)</label>
+                            <input type="number" id="percent" oninput="convertSpecial(this)">
+                        </div>
+                        <div class="input-group">
+                            <label for="deg">Graus (°)</label>
+                            <input type="number" id="deg" oninput="convertSpecial(this)">
+                        </div>
+                    </div>
+                `;
+            }
 
 
             // --- Navigation & UI ---
@@ -522,24 +558,78 @@
 
             // --- Init ---
             buildSections();
-            // Re-add event listeners for any static converters if they exist
             changeSection(window.location.hash);
             applyTheme(localStorage.getItem('theme') || 'light');
         });
 
         // --- Global Functions ---
         
-        function updateRoughness(selectElement) {
+        window.updateRoughness = function(selectElement) {
             const resultDiv = document.getElementById('roughness-result');
             const value = selectElement.value;
             resultDiv.textContent = value ? `${value} mm` : '-';
         }
 
-        function convertDynamic(unitCategory) {
-            // This is a placeholder for the new conversion logic
-            // The full implementation would get values from the selects and inputs
-            // and perform the calculation based on the new unitsData structure.
-            console.log("Converting for category:", unitCategory);
+        window.convertDynamic = function(element) {
+            const card = element.closest('.converter-card');
+            const sectionKey = card.dataset.section;
+            const section = sectionsData[sectionKey];
+
+            const fromValueInput = card.querySelector('.from-value');
+            const toValueInput = card.querySelector('.to-value');
+
+            const fromValue = parseFloat(fromValueInput.value);
+            if (isNaN(fromValue)) {
+                toValueInput.value = '';
+                return;
+            }
+
+            let fromFactor = 1;
+            let toFactor = 1;
+
+            if (section.type === 'simple') {
+                const fromUnit = card.querySelector('.from-unit').value;
+                const toUnit = card.querySelector('.to-unit').value;
+                fromFactor = unitsData[section.unit].units[fromUnit].factor;
+                toFactor = unitsData[section.unit].units[toUnit].factor;
+            } else if (section.type === 'composite') {
+                const fromNumUnit = card.querySelector('.from-num-unit').value;
+                const fromDenUnit = card.querySelector('.from-den-unit').value;
+                const toNumUnit = card.querySelector('.to-num-unit').value;
+                const toDenUnit = card.querySelector('.to-den-unit').value;
+
+                fromFactor = unitsData[section.numerator].units[fromNumUnit].factor / unitsData[section.denominator].units[fromDenUnit].factor;
+                toFactor = unitsData[section.numerator].units[toNumUnit].factor / unitsData[section.denominator].units[toDenUnit].factor;
+            }
+
+            const valueInBase = fromValue * fromFactor;
+            const result = valueInBase / toFactor;
+
+            toValueInput.value = result.toPrecision(6);
+        }
+        
+        window.convertSpecial = function(element) {
+            const val = parseFloat(element.value);
+            const row = element.closest('.conversion-row');
+            const type = row.dataset.type;
+
+            if (isNaN(val)) {
+                row.querySelectorAll('input').forEach(i => { if (i.id !== element.id) i.value = ''; });
+                return;
+            }
+
+            if (type === 'temperature') {
+                let c, f, k;
+                if (element.id === 'celsius') { c = val; f = c * 9/5 + 32; k = c + 273.15; }
+                else if (element.id === 'fahrenheit') { f = val; c = (f - 32) * 5/9; k = c + 273.15; }
+                else { k = val; c = k - 273.15; f = c * 9/5 + 32; }
+                if (document.getElementById('celsius').id !== element.id) document.getElementById('celsius').value = c.toPrecision(6);
+                if (document.getElementById('fahrenheit').id !== element.id) document.getElementById('fahrenheit').value = f.toPrecision(6);
+                if (document.getElementById('kelvin').id !== element.id) document.getElementById('kelvin').value = k.toPrecision(6);
+            } else if (type === 'angle') {
+                if (element.id === 'percent') document.getElementById('deg').value = (Math.atan(val / 100) * (180 / Math.PI)).toPrecision(6);
+                else document.getElementById('percent').value = (Math.tan(val * Math.PI / 180) * 100).toPrecision(6);
+            }
         }
 
     </script>
