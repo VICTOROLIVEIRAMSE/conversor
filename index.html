@@ -18,6 +18,21 @@
             --text-sidebar-active: #ffffff;
             --border-color: #e5e7eb;
             --shadow-color: rgba(0, 0, 0, 0.05);
+            --input-bg: #ffffff;
+            --success-color: #22c55e;
+        }
+
+        :root[data-theme='dark'] {
+            --bg-color: #111827;
+            --sidebar-bg: #1f2937;
+            --card-bg: #374151;
+            --primary-accent: #60a5fa;
+            --text-dark: #d1d5db;
+            --text-light: #9ca3af;
+            --text-sidebar-active: #ffffff;
+            --border-color: #4b5563;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+            --input-bg: #4b5563;
         }
 
         * {
@@ -31,10 +46,11 @@
             background-color: var(--bg-color);
             color: var(--text-dark);
             display: flex;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         #sidebar {
-            width: 240px;
+            width: 260px;
             background-color: var(--sidebar-bg);
             color: var(--text-light);
             height: 100vh;
@@ -44,6 +60,7 @@
             padding: 20px 0;
             display: flex;
             flex-direction: column;
+            border-right: 1px solid var(--border-color);
         }
 
         #sidebar h1 {
@@ -53,19 +70,44 @@
             border-bottom: 1px solid #374151;
             margin-bottom: 10px;
         }
+        
+        #search-box {
+            margin: 0 20px 10px 20px;
+        }
+        
+        #search-input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #4b5563;
+            background-color: #374151;
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+        }
+
+        #sidebar nav {
+            overflow-y: auto;
+        }
 
         #sidebar nav ul {
             list-style: none;
         }
 
         #sidebar nav a {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             padding: 12px 20px;
             color: var(--text-light);
             text-decoration: none;
             font-weight: 500;
             transition: background-color 0.2s ease, color 0.2s ease;
             border-left: 3px solid transparent;
+        }
+        
+        #sidebar nav a .icon {
+            width: 20px;
+            height: 20px;
         }
 
         #sidebar nav a:hover {
@@ -75,7 +117,6 @@
         #sidebar nav a.active {
             background-color: var(--primary-accent);
             color: var(--text-sidebar-active);
-            border-left-color: #a5f3fc;
         }
         
         #sidebar .footer {
@@ -84,21 +125,56 @@
             font-size: 0.8rem;
             color: #6b7280;
             text-align: center;
+            border-top: 1px solid #374151;
         }
+
+        .theme-switcher {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .switch input { display: none; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #4b5563;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px; width: 14px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--primary-accent); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
         #main-content {
-            margin-left: 240px;
+            margin-left: 260px;
             padding: 30px;
-            width: calc(100% - 240px);
+            width: calc(100% - 260px);
         }
 
-        .converter-section {
-            display: none;
-        }
-
-        .converter-section.active {
-            display: block;
-        }
+        .converter-section { display: none; }
+        .converter-section.active { display: block; }
 
         .converter-card {
             background-color: var(--card-bg);
@@ -107,6 +183,7 @@
             padding: 20px;
             margin-bottom: 20px;
             box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: background-color 0.3s, border-color 0.3s;
         }
         
         .converter-card h3 {
@@ -118,28 +195,31 @@
         .conversion-row {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
 
         .input-group {
             flex: 1;
             display: flex;
+            position: relative;
             flex-direction: column;
         }
 
         .input-group label {
             font-size: 0.9rem;
             margin-bottom: 5px;
-            color: #4b5563;
+            color: #6b7280;
         }
 
         .input-group input {
             width: 100%;
-            padding: 10px;
+            padding: 10px 40px 10px 10px; /* Space for copy button */
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 1rem;
             font-family: 'Inter', sans-serif;
+            background-color: var(--input-bg);
+            color: var(--text-dark);
             transition: border-color 0.2s, box-shadow 0.2s;
         }
 
@@ -149,57 +229,61 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
         
-        .equals-sign {
-            font-size: 1.5rem;
-            color: #9ca3af;
+        .copy-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(calc(-50% + 10px));
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            opacity: 0.6;
         }
+        .copy-btn:hover { opacity: 1; background-color: rgba(0,0,0,0.1); }
+        .copy-btn.copied { stroke: var(--success-color); }
+        
+        .swap-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .swap-btn:hover { background-color: var(--bg-color); }
+        .swap-btn:active { transform: rotate(180deg); }
+
+        .equals-sign { display: none; } /* Replaced by swap button */
         
         #fractional-result {
             font-weight: 500;
             color: var(--primary-accent);
             font-size: 1rem;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
+            body { flex-direction: column; }
             #sidebar {
                 width: 100%;
                 height: auto;
                 position: relative;
-                flex-direction: row;
-                align-items: center;
-                padding: 0;
-                overflow-x: auto;
+                flex-direction: column;
+                padding-bottom: 10px;
             }
-            #sidebar h1 {
-                display: none; /* Hide title on mobile for more space */
-            }
-            #sidebar nav {
-                width: 100%;
-            }
-            #sidebar nav ul {
-                display: flex;
-                width: 100%;
-            }
-             #sidebar nav li {
-                flex: 1;
-                text-align: center;
-            }
-            #sidebar nav a {
-                border-left: none;
-                border-bottom: 3px solid transparent;
-                padding: 15px 5px;
-            }
-            #sidebar nav a.active {
-                border-left-color: transparent;
-                border-bottom-color: #a5f3fc;
-            }
-            #sidebar .footer {
-                display: none;
-            }
+            #sidebar nav { max-height: 150px; }
             #main-content {
                 margin-left: 0;
                 width: 100%;
@@ -209,552 +293,345 @@
                 flex-direction: column;
                 align-items: stretch;
             }
-            .equals-sign {
-                transform: rotate(90deg);
-                margin: 10px 0;
+            .swap-btn {
+                align-self: center;
+                margin-top: 5px;
+                margin-bottom: 5px;
             }
         }
-
     </style>
 </head>
 <body>
 
     <aside id="sidebar">
         <h1>Conversor PRO</h1>
+        <div id="search-box">
+            <input type="search" id="search-input" placeholder="Buscar categoria...">
+        </div>
         <nav>
-            <ul>
-                <li><a href="#comprimento" class="nav-link active">Comprimento</a></li>
-                <li><a href="#area" class="nav-link">Área</a></li>
-                <li><a href="#volume" class="nav-link">Volume</a></li>
-                <li><a href="#massa" class="nav-link">Massa</a></li>
-                <li><a href="#forca" class="nav-link">Força</a></li>
-                <li><a href="#pressao" class="nav-link">Pressão</a></li>
-                <li><a href="#velocidade" class="nav-link">Velocidade</a></li>
-                <li><a href="#torque" class="nav-link">Torque</a></li>
-                <li><a href="#potencia" class="nav-link">Potência</a></li>
-                <li><a href="#energia" class="nav-link">Energia</a></li>
-                <li><a href="#densidade" class="nav-link">Densidade</a></li>
-                <li><a href="#vazao" class="nav-link">Vazão</a></li>
-                <li><a href="#angulo" class="nav-link">Ângulo</a></li>
+            <ul id="menu-list">
+                <li><a href="#comprimento" class="nav-link active"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>Comprimento</a></li>
+                <li><a href="#temperatura" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10a4 4 0 10-8 0 4 4 0 008 0zm-4 7.5V19m-4-6.5a4 4 0 118 0 4 4 0 01-8 0zM9 10a1 1 0 100-2 1 1 0 000 2z"></path></svg>Temperatura</a></li>
+                <li><a href="#area" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 2h18v20H3zM21 2l-8.5 8.5M3 22l8.5-8.5"></path></svg>Área</a></li>
+                <li><a href="#volume" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4-8-4V7"></path></svg>Volume</a></li>
+                <li><a href="#massa" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4m16 0a8 8 0 11-16 0 8 8 0 0116 0z"></path></svg>Massa</a></li>
+                <li><a href="#forca" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>Força</a></li>
+                <li><a href="#pressao" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8 4.03-8 9-8 9 3.582 9 8z"></path></svg>Pressão</a></li>
+                <li><a href="#velocidade" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>Velocidade</a></li>
+                <li><a href="#torque" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.414 1.414l-2.828 2.828a2 2 0 01-2.828 0l-4.243-4.243a2 2 0 010-2.828l2.828-2.828a2 2 0 001.414-1.414l-1.414-1.414a2 2 0 010-2.828l4.243-4.243a2 2 0 012.828 0l1.414 1.414a2 2 0 001.414-1.414l1.414-1.414a2 2 0 012.828 0l2.828 2.828a2 2 0 010 2.828l-1.414 1.414z"></path></svg>Torque</a></li>
+                <li><a href="#potencia" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 16v-2m8-8h2M4 12H2m15.364 6.364l1.414 1.414M4.222 4.222l1.414 1.414m12.728 0l-1.414 1.414M5.636 18.364l-1.414 1.414"></path></svg>Potência</a></li>
+                <li><a href="#energia" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M19 3v4M3 10h18M5 14h14M5 18h14M3 22h18"></path></svg>Energia</a></li>
+                <li><a href="#densidade" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 4v0a2 2 0 012-2h2a2 2 0 012 2v0m-6 8v0a2 2 0 012-2h2a2 2 0 012 2v0m-6 8v0a2 2 0 012-2h2a2 2 0 012 2v0M9 4h6v16H9V4z"></path></svg>Densidade</a></li>
+                <li><a href="#vazao" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>Vazão</a></li>
+                <li><a href="#angulo" class="nav-link"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>Ângulo</a></li>
             </ul>
         </nav>
         <div class="footer">
-            <p>&copy; 2024 - Gerado por Gemini</p>
+            <div class="theme-switcher">
+                <span>Light</span>
+                <label class="switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span>Dark</span>
+            </div>
         </div>
     </aside>
 
     <main id="main-content">
-        <!-- Seção de Comprimento -->
-        <section id="comprimento" class="converter-section active">
-            <h2>Comprimento</h2>
-            <div class="converter-card">
-                <h3>Milímetro (mm) ↔ Polegada (in)</h3>
-                <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="mm">Milímetros (mm)</label>
-                        <input type="number" id="mm" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="inch-dec">Polegadas Decimais (in)</label>
-                        <input type="number" id="inch-dec" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-                 <div class="conversion-row" style="margin-top: 15px;">
-                    <div class="input-group">
-                        <label>Polegadas Fracionárias (aprox.)</label>
-                        <div id="fractional-result" class="input-group" style="padding: 10px; min-height: 42px; justify-content: center;">-</div>
-                    </div>
-                </div>
-            </div>
-            <div class="converter-card">
-                <h3>Metro (m) ↔ Pé (ft)</h3>
-                <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="m">Metros (m)</label>
-                        <input type="number" id="m" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="ft">Pés (ft)</label>
-                        <input type="number" id="ft" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-             <div class="converter-card">
-                <h3>Quilômetro (km) ↔ Milha (mi)</h3>
-                <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="km">Quilômetros (km)</label>
-                        <input type="number" id="km" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="mi">Milhas (mi)</label>
-                        <input type="number" id="mi" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Seção de Área -->
-        <section id="area" class="converter-section">
-            <h2>Área</h2>
-            <div class="converter-card">
-                <h3>Metro Quadrado (m²) ↔ Pé Quadrado (ft²)</h3>
-                <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="m2">m²</label>
-                        <input type="number" id="m2" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="ft2">ft²</label>
-                        <input type="number" id="ft2" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-            <div class="converter-card">
-                <h3>Hectare (ha) ↔ Acre (acre)</h3>
-                <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="ha">ha</label>
-                        <input type="number" id="ha" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="acre">acre</label>
-                        <input type="number" id="acre" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Seção de Volume -->
-        <section id="volume" class="converter-section">
-            <h2>Volume</h2>
-            <div class="converter-card">
-                <h3>Litro (L) ↔ Galão Americano (gal)</h3>
-                <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="l">Litros (L)</label>
-                        <input type="number" id="l" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="gal">Galões (gal)</label>
-                        <input type="number" id="gal" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-            <div class="converter-card">
-                <h3>Metro Cúbico (m³) ↔ Pé Cúbico (ft³)</h3>
-                <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="m3">m³</label>
-                        <input type="number" id="m3" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="ft3">ft³</label>
-                        <input type="number" id="ft3" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Seção de Massa -->
-        <section id="massa" class="converter-section">
-            <h2>Massa</h2>
-            <div class="converter-card">
-                <h3>Quilograma (kg) ↔ Libra (lb)</h3>
-                 <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="kg">kg</label>
-                        <input type="number" id="kg" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="lb">lb</label>
-                        <input type="number" id="lb" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-            <div class="converter-card">
-                <h3>Grama (g) ↔ Onça (oz)</h3>
-                 <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="g">g</label>
-                        <input type="number" id="g" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="oz">oz</label>
-                        <input type="number" id="oz" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Seção de Força -->
-        <section id="forca" class="converter-section">
-            <h2>Força</h2>
-            <div class="converter-card">
-                <h3>Newton (N) ↔ Libra-força (lbf)</h3>
-                 <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="n">N</label>
-                        <input type="number" id="n" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="lbf">lbf</label>
-                        <input type="number" id="lbf" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-            <div class="converter-card">
-                <h3>Quilonewton (kN) ↔ Kip (kilopound-force)</h3>
-                 <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="kn">kN</label>
-                        <input type="number" id="kn" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="kip">kip</label>
-                        <input type="number" id="kip" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Seção de Pressão -->
-        <section id="pressao" class="converter-section">
-            <h2>Pressão</h2>
-            <div class="converter-card">
-                <h3>Quilopascal (kPa) ↔ PSI (lbf/in²)</h3>
-                 <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="kpa">kPa</label>
-                        <input type="number" id="kpa" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="psi">psi</label>
-                        <input type="number" id="psi" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-             <div class="converter-card">
-                <h3>Bar ↔ Atmosfera (atm)</h3>
-                 <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="bar">bar</label>
-                        <input type="number" id="bar" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="atm">atm</label>
-                        <input type="number" id="atm" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Seção de Velocidade -->
-        <section id="velocidade" class="converter-section">
-            <h2>Velocidade</h2>
-            <div class="converter-card">
-                <h3>Metros por segundo (m/s) ↔ Pés por segundo (ft/s)</h3>
-                 <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="mps">m/s</label>
-                        <input type="number" id="mps" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="ftps">ft/s</label>
-                        <input type="number" id="ftps" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-            <div class="converter-card">
-                <h3>Quilômetros por hora (km/h) ↔ Milhas por hora (mph)</h3>
-                 <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="kmh">km/h</label>
-                        <input type="number" id="kmh" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="mph">mph</label>
-                        <input type="number" id="mph" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Seção de Torque -->
-        <section id="torque" class="converter-section">
-            <h2>Torque</h2>
-            <div class="converter-card">
-                <h3>Newton-metro (N·m) ↔ Libra-força-pé (lbf·ft)</h3>
-                 <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="nm">N·m</label>
-                        <input type="number" id="nm" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="lbfft">lbf·ft</label>
-                        <input type="number" id="lbfft" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Seção de Potência -->
-        <section id="potencia" class="converter-section">
-            <h2>Potência</h2>
-            <div class="converter-card">
-                <h3>Quilowatt (kW) ↔ Horsepower (hp)</h3>
-                 <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="kw">kW</label>
-                        <input type="number" id="kw" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="hp">hp</label>
-                        <input type="number" id="hp" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Seção de Energia -->
-        <section id="energia" class="converter-section">
-            <h2>Energia</h2>
-            <div class="converter-card">
-                <h3>Joule (J) ↔ British Thermal Unit (BTU)</h3>
-                 <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="j">J</label>
-                        <input type="number" id="j" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="btu">BTU</label>
-                        <input type="number" id="btu" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Seção de Densidade -->
-        <section id="densidade" class="converter-section">
-            <h2>Densidade</h2>
-            <div class="converter-card">
-                <h3>kg/m³ ↔ lb/ft³</h3>
-                 <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="kgm3">kg/m³</label>
-                        <input type="number" id="kgm3" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="lbft3">lb/ft³</label>
-                        <input type="number" id="lbft3" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Seção de Vazão -->
-        <section id="vazao" class="converter-section">
-            <h2>Vazão</h2>
-            <div class="converter-card">
-                <h3>Litros por segundo (L/s) ↔ Galões por minuto (GPM)</h3>
-                 <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="lps">L/s</label>
-                        <input type="number" id="lps" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="gpm">GPM</label>
-                        <input type="number" id="gpm" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Seção de Ângulo -->
-        <section id="angulo" class="converter-section">
-            <h2>Ângulo e Inclinação</h2>
-            <div class="converter-card">
-                <h3>Inclinação (%) ↔ Ângulo (°)</h3>
-                 <div class="conversion-row">
-                    <div class="input-group">
-                        <label for="percent">%</label>
-                        <input type="number" id="percent" oninput="convert(this.id, this.value)">
-                    </div>
-                    <div class="equals-sign">=</div>
-                    <div class="input-group">
-                        <label for="deg">°</label>
-                        <input type="number" id="deg" oninput="convert(this.id, this.value)">
-                    </div>
-                </div>
-            </div>
-        </section>
-
+        <!-- Sections will be dynamically displayed here -->
     </main>
 
     <script>
-        // --- Navigation Logic ---
+        // --- Full App Logic ---
         document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- UI Elements ---
+            const mainContent = document.getElementById('main-content');
             const navLinks = document.querySelectorAll('.nav-link');
-            const sections = document.querySelectorAll('.converter-section');
+            const menuList = document.getElementById('menu-list');
+            const searchInput = document.getElementById('search-input');
+            const themeToggle = document.getElementById('theme-toggle');
 
-            // Function to change active section
-            const changeSection = (hash) => {
-                navLinks.forEach(link => {
-                    link.classList.toggle('active', link.hash === hash);
-                });
-                sections.forEach(section => {
-                    section.classList.toggle('active', '#' + section.id === hash);
-                });
+            // --- Data & State ---
+            const sectionsData = {
+                comprimento: { title: 'Comprimento', conversions: [
+                    { title: 'Milímetro (mm) ↔ Polegada (in)', units: ['mm', 'inch-dec'], special: 'fractional' },
+                    { title: 'Metro (m) ↔ Pé (ft)', units: ['m', 'ft'] },
+                    { title: 'Quilômetro (km) ↔ Milha (mi)', units: ['km', 'mi'] }
+                ]},
+                temperatura: { title: 'Temperatura', conversions: [
+                    { title: 'Celsius (°C) ↔ Fahrenheit (°F) ↔ Kelvin (K)', units: ['celsius', 'fahrenheit', 'kelvin'], type: 'temperature' }
+                ]},
+                area: { title: 'Área', conversions: [
+                    { title: 'Metro Quadrado (m²) ↔ Pé Quadrado (ft²)', units: ['m2', 'ft2'] },
+                    { title: 'Hectare (ha) ↔ Acre (acre)', units: ['ha', 'acre'] }
+                ]},
+                volume: { title: 'Volume', conversions: [
+                    { title: 'Litro (L) ↔ Galão Americano (gal)', units: ['l', 'gal'] },
+                    { title: 'Metro Cúbico (m³) ↔ Pé Cúbico (ft³)', units: ['m3', 'ft3'] }
+                ]},
+                massa: { title: 'Massa', conversions: [
+                    { title: 'Quilograma (kg) ↔ Libra (lb)', units: ['kg', 'lb'] },
+                    { title: 'Grama (g) ↔ Onça (oz)', units: ['g', 'oz'] }
+                ]},
+                forca: { title: 'Força', conversions: [
+                    { title: 'Newton (N) ↔ Libra-força (lbf)', units: ['n', 'lbf'] },
+                    { title: 'Quilonewton (kN) ↔ Kip (kilopound-force)', units: ['kn', 'kip'] }
+                ]},
+                pressao: { title: 'Pressão', conversions: [
+                    { title: 'Quilopascal (kPa) ↔ PSI (lbf/in²)', units: ['kpa', 'psi'] },
+                    { title: 'Bar ↔ Atmosfera (atm)', units: ['bar', 'atm'] }
+                ]},
+                velocidade: { title: 'Velocidade', conversions: [
+                    { title: 'Metros por segundo (m/s) ↔ Pés por segundo (ft/s)', units: ['mps', 'ftps'] },
+                    { title: 'Quilômetros por hora (km/h) ↔ Milhas por hora (mph)', units: ['kmh', 'mph'] }
+                ]},
+                torque: { title: 'Torque', conversions: [
+                    { title: 'Newton-metro (N·m) ↔ Libra-força-pé (lbf·ft)', units: ['nm', 'lbfft'] }
+                ]},
+                potencia: { title: 'Potência', conversions: [
+                    { title: 'Quilowatt (kW) ↔ Horsepower (hp)', units: ['kw', 'hp'] }
+                ]},
+                energia: { title: 'Energia', conversions: [
+                    { title: 'Joule (J) ↔ British Thermal Unit (BTU)', units: ['j', 'btu'] }
+                ]},
+                densidade: { title: 'Densidade', conversions: [
+                    { title: 'kg/m³ ↔ lb/ft³', units: ['kgm3', 'lbft3'] }
+                ]},
+                vazao: { title: 'Vazão', conversions: [
+                    { title: 'Litros por segundo (L/s) ↔ Galões por minuto (GPM)', units: ['lps', 'gpm'] }
+                ]},
+                angulo: { title: 'Ângulo e Inclinação', conversions: [
+                    { title: 'Inclinação (%) ↔ Ângulo (°)', units: ['percent', 'deg'], type: 'angle' }
+                ]}
             };
 
-            // Initial load
-            changeSection(window.location.hash || '#comprimento');
+            const unitLabels = {
+                'mm': 'Milímetros (mm)', 'inch-dec': 'Polegadas (in)', 'm': 'Metros (m)', 'ft': 'Pés (ft)', 'km': 'Quilômetros (km)', 'mi': 'Milhas (mi)',
+                'celsius': 'Celsius (°C)', 'fahrenheit': 'Fahrenheit (°F)', 'kelvin': 'Kelvin (K)',
+                'm2': 'm²', 'ft2': 'ft²', 'ha': 'Hectares (ha)', 'acre': 'Acres',
+                'l': 'Litros (L)', 'gal': 'Galões (gal)', 'm3': 'm³', 'ft3': 'ft³',
+                'kg': 'Quilogramas (kg)', 'lb': 'Libras (lb)', 'g': 'Gramas (g)', 'oz': 'Onças (oz)',
+                'n': 'Newtons (N)', 'lbf': 'Libras-força (lbf)', 'kn': 'Quilonewtons (kN)', 'kip': 'Kips',
+                'kpa': 'Quilopascals (kPa)', 'psi': 'PSI (lbf/in²)', 'bar': 'Bar', 'atm': 'Atmosferas (atm)',
+                'mps': 'm/s', 'ftps': 'ft/s', 'kmh': 'km/h', 'mph': 'mph',
+                'nm': 'N·m', 'lbfft': 'lbf·ft',
+                'kw': 'Quilowatts (kW)', 'hp': 'Horsepower (hp)',
+                'j': 'Joules (J)', 'btu': 'BTUs',
+                'kgm3': 'kg/m³', 'lbft3': 'lb/ft³',
+                'lps': 'L/s', 'gpm': 'GPM',
+                'percent': 'Inclinação (%)', 'deg': 'Ângulo (°)'
+            };
 
-            // Handle clicks
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    history.pushState(null, '', this.hash); // Change URL without reloading
-                    changeSection(this.hash);
+            // --- HTML Generation ---
+            function createInputGroup(unitId, isFirst) {
+                return `
+                    <div class="input-group" data-unit-id="${unitId}">
+                        <label for="${unitId}">${unitLabels[unitId]}</label>
+                        <input type="number" id="${unitId}" step="any" oninput="convert(this.id, this.value)">
+                        <button class="copy-btn" onclick="copyToClipboard('${unitId}', this)" title="Copiar valor">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        </button>
+                    </div>
+                `;
+            }
+
+            function buildSections() {
+                for (const key in sectionsData) {
+                    const sectionData = sectionsData[key];
+                    const sectionEl = document.createElement('section');
+                    sectionEl.id = key;
+                    sectionEl.className = 'converter-section';
+                    
+                    let content = `<h2>${sectionData.title}</h2>`;
+                    sectionData.conversions.forEach(conv => {
+                        content += `<div class="converter-card" data-type="${conv.type || 'standard'}"><h3>${conv.title}</h3>`;
+                        
+                        const groups = conv.units.map((unit, index) => createInputGroup(unit, index === 0)).join(`
+                            <button class="swap-btn" onclick="swapUnits(this)" title="Inverter unidades">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 12l-4-4m4 4l4-4m6 8v-12m0 12l4-4m-4 4l-4-4"></path></svg>
+                            </button>
+                        `);
+                        
+                        content += `<div class="conversion-row">${groups}</div>`;
+
+                        if (conv.special === 'fractional') {
+                            content += `
+                                <div class="conversion-row" style="margin-top: 15px;">
+                                    <div class="input-group">
+                                        <label>Polegadas Fracionárias (aprox.)</label>
+                                        <div id="fractional-result" class="input-group" style="padding: 10px; min-height: 42px; justify-content: center;">-</div>
+                                    </div>
+                                </div>`;
+                        }
+                        content += `</div>`;
+                    });
+                    sectionEl.innerHTML = content;
+                    mainContent.appendChild(sectionEl);
+                }
+            }
+
+            // --- Navigation & UI ---
+            function changeSection(hash) {
+                const targetHash = hash || '#comprimento';
+                navLinks.forEach(link => link.classList.toggle('active', link.hash === targetHash));
+                document.querySelectorAll('.converter-section').forEach(section => {
+                    section.classList.toggle('active', '#' + section.id === targetHash);
+                });
+            }
+
+            searchInput.addEventListener('keyup', () => {
+                const filter = searchInput.value.toLowerCase();
+                menuList.querySelectorAll('li').forEach(li => {
+                    const text = li.textContent.toLowerCase();
+                    li.style.display = text.includes(filter) ? '' : 'none';
                 });
             });
             
-            // Handle back/forward browser buttons
-            window.addEventListener('popstate', () => {
-                changeSection(window.location.hash || '#comprimento');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    history.pushState(null, '', this.hash);
+                    changeSection(this.hash);
+                });
             });
+
+            window.addEventListener('popstate', () => changeSection(window.location.hash));
+
+            // --- Theme ---
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                themeToggle.checked = theme === 'dark';
+            }
+            themeToggle.addEventListener('change', () => {
+                const newTheme = themeToggle.checked ? 'dark' : 'light';
+                localStorage.setItem('theme', newTheme);
+                applyTheme(newTheme);
+            });
+
+            // --- Init ---
+            buildSections();
+            changeSection(window.location.hash);
+            applyTheme(localStorage.getItem('theme') || 'light');
         });
 
-        // --- Conversion Logic ---
+        // --- Global Functions ---
         const factors = {
-            // Comprimento
-            mm: { target: 'inch-dec', factor: 1 / 25.4 },
-            'inch-dec': { target: 'mm', factor: 25.4 },
-            m: { target: 'ft', factor: 3.28084 },
-            ft: { target: 'm', factor: 1 / 3.28084 },
-            km: { target: 'mi', factor: 0.621371 },
-            mi: { target: 'km', factor: 1 / 0.621371 },
-            // Area
-            m2: { target: 'ft2', factor: 10.7639 },
-            ft2: { target: 'm2', factor: 1 / 10.7639 },
-            ha: { target: 'acre', factor: 2.47105 },
-            acre: { target: 'ha', factor: 1 / 2.47105 },
-            // Volume
-            l: { target: 'gal', factor: 0.264172 },
-            gal: { target: 'l', factor: 1 / 0.264172 },
-            m3: { target: 'ft3', factor: 35.3147 },
-            ft3: { target: 'm3', factor: 1 / 35.3147 },
-            // Massa
-            kg: { target: 'lb', factor: 2.20462 },
-            lb: { target: 'kg', factor: 1 / 2.20462 },
-            g: { target: 'oz', factor: 0.035274 },
-            oz: { target: 'g', factor: 1 / 0.035274 },
-            // Força
-            n: { target: 'lbf', factor: 0.224809 },
-            lbf: { target: 'n', factor: 1 / 0.224809 },
-            kn: { target: 'kip', factor: 0.224809 },
-            kip: { target: 'kn', factor: 1 / 0.224809 },
-            // Pressão
-            kpa: { target: 'psi', factor: 0.145038 },
-            psi: { target: 'kpa', factor: 1 / 0.145038 },
-            bar: { target: 'atm', factor: 0.986923 },
-            atm: { target: 'bar', factor: 1 / 0.986923 },
-            // Velocidade
-            mps: { target: 'ftps', factor: 3.28084 },
-            ftps: { target: 'mps', factor: 1 / 3.28084 },
-            kmh: { target: 'mph', factor: 0.621371 },
-            mph: { target: 'kmh', factor: 1 / 0.621371 },
-            // Torque
-            nm: { target: 'lbfft', factor: 0.737562 },
-            lbfft: { target: 'nm', factor: 1 / 0.737562 },
-            // Potência
-            kw: { target: 'hp', factor: 1.34102 },
-            hp: { target: 'kw', factor: 1 / 1.34102 },
-            // Energia
-            j: { target: 'btu', factor: 0.000947817 },
-            btu: { target: 'j', factor: 1 / 0.000947817 },
-            // Densidade
-            kgm3: { target: 'lbft3', factor: 0.062428 },
-            lbft3: { target: 'kgm3', factor: 1 / 0.062428 },
-            // Vazão
-            lps: { target: 'gpm', factor: 15.8503 },
-            gpm: { target: 'lps', factor: 1 / 15.8503 },
+            'mm': { target: 'inch-dec', factor: 1 / 25.4 }, 'inch-dec': { target: 'mm', factor: 25.4 },
+            'm': { target: 'ft', factor: 3.28084 }, 'ft': { target: 'm', factor: 1 / 3.28084 },
+            'km': { target: 'mi', factor: 0.621371 }, 'mi': { target: 'km', factor: 1 / 0.621371 },
+            'm2': { target: 'ft2', factor: 10.7639 }, 'ft2': { target: 'm2', factor: 1 / 10.7639 },
+            'ha': { target: 'acre', factor: 2.47105 }, 'acre': { target: 'ha', factor: 1 / 2.47105 },
+            'l': { target: 'gal', factor: 0.264172 }, 'gal': { target: 'l', factor: 3.78541 },
+            'm3': { target: 'ft3', factor: 35.3147 }, 'ft3': { target: 'm3', factor: 1 / 35.3147 },
+            'kg': { target: 'lb', factor: 2.20462 }, 'lb': { target: 'kg', factor: 1 / 2.20462 },
+            'g': { target: 'oz', factor: 0.035274 }, 'oz': { target: 'g', factor: 1 / 0.035274 },
+            'n': { target: 'lbf', factor: 0.224809 }, 'lbf': { target: 'n', factor: 4.44822 },
+            'kn': { target: 'kip', factor: 0.224809 }, 'kip': { target: 'kn', factor: 4.44822 },
+            'kpa': { target: 'psi', factor: 0.145038 }, 'psi': { target: 'kpa', factor: 6.89476 },
+            'bar': { target: 'atm', factor: 0.986923 }, 'atm': { target: 'bar', factor: 1.01325 },
+            'mps': { target: 'ftps', factor: 3.28084 }, 'ftps': { target: 'mps', factor: 1 / 3.28084 },
+            'kmh': { target: 'mph', factor: 0.621371 }, 'mph': { target: 'kmh', factor: 1.60934 },
+            'nm': { target: 'lbfft', factor: 0.737562 }, 'lbfft': { target: 'nm', factor: 1.35582 },
+            'kw': { target: 'hp', factor: 1.34102 }, 'hp': { target: 'kw', factor: 0.7457 },
+            'j': { target: 'btu', factor: 0.000947817 }, 'btu': { target: 'j', factor: 1055.06 },
+            'kgm3': { target: 'lbft3', factor: 0.062428 }, 'lbft3': { target: 'kgm3', factor: 16.0185 },
+            'lps': { target: 'gpm', factor: 15.8503 }, 'gpm': { target: 'lps', factor: 0.0630902 },
         };
-        
-        // --- Special Functions ---
-        function gcd(a, b) { // Greatest Common Divisor
-            return b ? gcd(b, a % b) : a;
-        }
+
+        function gcd(a, b) { return b ? gcd(b, a % b) : a; }
 
         function toFractionalInch(decimalInches) {
             if (isNaN(decimalInches) || decimalInches === 0) return '-';
             const whole = Math.floor(decimalInches);
             const fraction = decimalInches - whole;
-            if (fraction === 0) return `${whole}"`;
-
-            const denominator = 64; // Common precision for engineering
+            if (fraction < 0.001) return `${whole}"`;
+            const denominator = 64;
             let numerator = Math.round(fraction * denominator);
             if (numerator === 0) return `≈ ${whole}"`;
             if (numerator === denominator) return `${whole + 1}"`;
-
             const divisor = gcd(numerator, denominator);
-            const simpNum = numerator / divisor;
-            const simpDen = denominator / divisor;
-
-            return (whole > 0 ? `${whole} ` : '') + `${simpNum}/${simpDen}"`;
+            return (whole > 0 ? `${whole} ` : '') + `${numerator / divisor}/${denominator / divisor}"`;
+        }
+        
+        function copyToClipboard(inputId, btn) {
+            const input = document.getElementById(inputId);
+            navigator.clipboard.writeText(input.value).then(() => {
+                btn.classList.add('copied');
+                setTimeout(() => btn.classList.remove('copied'), 1500);
+            });
+        }
+        
+        function swapUnits(btn) {
+            const row = btn.closest('.conversion-row');
+            const groups = row.querySelectorAll('.input-group');
+            row.insertBefore(groups[1], groups[0]); // Swap the DOM elements
+            
+            // Clear values after swapping
+            groups.forEach(g => g.querySelector('input').value = '');
+            const fractionalResult = row.parentElement.querySelector('#fractional-result');
+            if(fractionalResult) fractionalResult.innerHTML = '-';
         }
 
         function convert(id, value) {
             const val = parseFloat(value);
-            if (isNaN(val) || value === '') {
-                // Clear all related fields if input is invalid or empty
-                const allIds = Object.keys(factors).filter(k => factors[k].target === id || factors[id]?.target === k);
-                allIds.push(id, factors[id]?.target);
-                new Set(allIds).forEach(fieldId => {
-                    if (document.getElementById(fieldId)) document.getElementById(fieldId).value = '';
-                });
-                if (id === 'mm' || id === 'inch-dec') document.getElementById('fractional-result').innerHTML = '-';
+            const card = document.getElementById(id).closest('.converter-card');
+            const conversionType = card.dataset.type;
+            
+            const inputs = Array.from(card.querySelectorAll('input[type="number"]'));
+            if (value === '' || isNaN(val)) {
+                inputs.forEach(input => { if(input.id !== id) input.value = ''; });
+                if (card.querySelector('#fractional-result')) card.querySelector('#fractional-result').innerHTML = '-';
                 return;
             }
 
-            // Handle standard conversions
-            if (factors[id]) {
-                const { target, factor } = factors[id];
-                document.getElementById(target).value = (val * factor).toPrecision(6);
-            }
-            
-            // Handle special cases
-            if (id === 'mm' || id === 'inch-dec') {
-                const inches = id === 'mm' ? val / 25.4 : val;
-                document.getElementById('fractional-result').innerHTML = toFractionalInch(inches);
-            }
-            
-            if (id === 'percent') {
-                const angle = Math.atan(val / 100) * (180 / Math.PI);
-                document.getElementById('deg').value = angle.toPrecision(6);
-            } else if (id === 'deg') {
-                const percentage = Math.tan(val * Math.PI / 180) * 100;
-                document.getElementById('percent').value = percentage.toPrecision(6);
+            if (conversionType === 'temperature') {
+                let c, f, k;
+                if (id === 'celsius') {
+                    c = val;
+                    f = c * 9/5 + 32;
+                    k = c + 273.15;
+                } else if (id === 'fahrenheit') {
+                    f = val;
+                    c = (f - 32) * 5/9;
+                    k = c + 273.15;
+                } else if (id === 'kelvin') {
+                    k = val;
+                    c = k - 273.15;
+                    f = c * 9/5 + 32;
+                }
+                document.getElementById('celsius').value = id === 'celsius' ? val : c.toPrecision(6);
+                document.getElementById('fahrenheit').value = id === 'fahrenheit' ? val : f.toPrecision(6);
+                document.getElementById('kelvin').value = id === 'kelvin' ? val : k.toPrecision(6);
+
+            } else if (conversionType === 'angle') {
+                if (id === 'percent') {
+                    document.getElementById('deg').value = (Math.atan(val / 100) * (180 / Math.PI)).toPrecision(6);
+                } else { // deg
+                    document.getElementById('percent').value = (Math.tan(val * Math.PI / 180) * 100).toPrecision(6);
+                }
+            } else { // Standard conversion
+                const sourceUnit = card.querySelector('.input-group:first-child').dataset.unitId;
+                const targetUnit = card.querySelector('.input-group:last-child').dataset.unitId;
+                
+                const currentId = (id === sourceUnit) ? sourceUnit : targetUnit;
+                const targetId = (id === sourceUnit) ? targetUnit : sourceUnit;
+                
+                if (factors[currentId] && factors[currentId].target === targetId) {
+                    document.getElementById(targetId).value = (val * factors[currentId].factor).toPrecision(6);
+                } else if (factors[targetId] && factors[targetId].target === currentId) {
+                     document.getElementById(targetId).value = (val / factors[currentId].factor).toPrecision(6);
+                }
+                
+                // Handle fractional inches special case
+                const fractionalResult = card.querySelector('#fractional-result');
+                if (fractionalResult) {
+                    const inches = (id === 'mm') ? val / 25.4 : (id === 'inch-dec' ? val : null);
+                    if (inches !== null) {
+                        fractionalResult.innerHTML = toFractionalInch(inches);
+                    }
+                }
             }
         }
     </script>
