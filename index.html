@@ -418,6 +418,7 @@
             }
 
             function createUnitOptions(unitType) {
+                if (!unitsData[unitType]) return '';
                 return Object.entries(unitsData[unitType].units)
                     .map(([key, value]) => `<option value="${key}">${value.name}</option>`)
                     .join('');
